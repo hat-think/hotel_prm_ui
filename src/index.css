@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap");
+
+/* Set default fonts using Tailwind classes */
+/* body {
+  @apply font-body text-gray-800 bg-gray-50;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply font-heading text-gray-900;
+} */

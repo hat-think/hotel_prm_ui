@@ -1,30 +1,23 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import Dashboard from './pages/Dashboard';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+// import Profile from "./pages/Profile";
+// import Settings from "./pages/Settings";
+// import NotFound from "./pages/NotFound";
 
 const App = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  const toggleSidebar = () => {
-    setIsExpanded((prev) => !prev);
-  };
-
   return (
     <Router>
-      <div className="flex">
-        <Sidebar isExpanded={isExpanded} />
-        <div className="flex-1">
-          <Navbar toggleSidebar={toggleSidebar} />
-          <div className="p-6">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              {/* Add more routes as needed */}
-            </Routes>
-          </div>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        {/* <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} /> */}
+        {/* <Route path="*" element={<NotFound />} /> */}
+      </Routes>
     </Router>
   );
 };
