@@ -3,7 +3,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
 import { registerSchema, otpSchema } from "./validation";
 import { registerUser, verifyOtp } from "./api";
-import { STRINGS } from "../../utilities/string";
 import { Eye, EyeOff } from "lucide-react";
 
 const RegisterForm = () => {
@@ -13,45 +12,54 @@ const RegisterForm = () => {
     name: "",
     email: "",
     password: "",
-    mobile: "",
+    phone: "",
   });
-  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { AUTH } = STRINGS;
 
   const handleRegister = async (values) => {
     setFormData(values);
     try {
-      const res = await registerUser(values);
-      if (res?.data?.success) {
+      const res = await registerUser({
+        name: values.name,
+        password: values.password,
+        contact: {
+          email: values.email,
+          phone: values.phone,
+        },
+      });
+      console.log(res, "res");
+      if (res?.data?.status === 1) {
         setOtpStep(true);
+        setError("");
+      } else if (res?.status === 205) {
+        //Show toast message for already registered user
+        navigate("/login");
       } else {
-        setError(res?.data?.message || "Something went wrong.");
+        setError(res?.data?.msg || "Something went wrong.");
       }
     } catch {
       setError("Registration failed.");
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async (values) => {
     try {
-      await otpSchema.validate({ otp });
-      const res = await verifyOtp(formData.email, otp);
-      if (res?.data?.success) {
-        navigate("/dashboard");
+      const res = await verifyOtp(formData.email, values.otp);
+      if (res?.status === 0) {
+        navigate("/login");
       } else {
-        setError(res?.data?.message || "OTP verification failed.");
+        setError(res?.data?.msg || "OTP verification failed.");
       }
     } catch (err) {
-      setError(err?.message || "Invalid OTP.");
+      setError(err?.msg || "Invalid OTP.");
     }
   };
 
   return (
-    <div className="bg-white p-10 rounded-2xl shadow-2xl w-96 h-auto">
+    <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-xl mx-auto">
       <h2 className="text-3xl font-bold text-center text-blue-800 mb-6 font-heading">
-        {AUTH.REGISTER}
+        Register
       </h2>
 
       {error && (
@@ -68,12 +76,12 @@ const RegisterForm = () => {
           {({ isSubmitting }) => (
             <Form className="space-y-5">
               <div>
-                <label className="block text-sm font-medium">Name</label>
+                <label className="block text-sm font-medium mb-1">Name</label>
                 <Field
                   name="name"
                   type="text"
                   placeholder="Full Name"
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-2 focus:border-gray-600 transition duration-150 outline-none"
                 />
                 <ErrorMessage
                   name="name"
@@ -83,12 +91,12 @@ const RegisterForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium">Email</label>
+                <label className="block text-sm font-medium mb-1">Email</label>
                 <Field
                   name="email"
                   type="email"
                   placeholder="Email"
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-2 focus:border-gray-600 transition duration-150 outline-none"
                 />
                 <ErrorMessage
                   name="email"
@@ -98,12 +106,14 @@ const RegisterForm = () => {
               </div>
 
               <div className="relative">
-                <label className="block text-sm font-medium">Password</label>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
                 <Field
                   name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="form-input pr-10"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-2 focus:border-gray-600 transition duration-150 outline-none pr-10"
                 />
                 <span
                   onClick={() => setShowPassword(!showPassword)}
@@ -119,15 +129,15 @@ const RegisterForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium">Mobile</label>
+                <label className="block text-sm font-medium mb-1">Mobile</label>
                 <Field
-                  name="mobile"
+                  name="phone"
                   type="text"
                   placeholder="Mobile Number"
-                  className="form-input"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-2 focus:border-gray-600 transition duration-150 outline-none"
                 />
                 <ErrorMessage
-                  name="mobile"
+                  name="phone"
                   component="p"
                   className="text-red-500 text-xs mt-1"
                 />
@@ -138,7 +148,7 @@ const RegisterForm = () => {
                 disabled={isSubmitting}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
               >
-                {isSubmitting ? AUTH.PROCESSING : "Continue"}
+                {isSubmitting ? "Processing..." : "Continue"}
               </button>
 
               <button
@@ -152,36 +162,52 @@ const RegisterForm = () => {
           )}
         </Formik>
       ) : (
-        <div className="space-y-5">
-          <p className="text-center text-gray-700">
-            Enter the OTP sent to{" "}
-            <span className="font-semibold">{formData.mobile}</span>
-          </p>
+        <Formik
+          initialValues={{ otp: "" }}
+          validationSchema={otpSchema}
+          onSubmit={handleVerifyOtp}
+        >
+          {({ isSubmitting }) => (
+            <Form className="space-y-5">
+              <p className="text-center text-gray-700">
+                Enter the OTP sent to{" "}
+                <span className="font-semibold">{`${formData.phone} or ${formData.email}`}</span>
+              </p>
 
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            className="form-input w-full"
-          />
+              <div>
+                <Field
+                  name="otp"
+                  type="text"
+                  placeholder="Enter OTP"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-2 focus:border-gray-600 transition duration-150 outline-none"
+                />
+                <ErrorMessage
+                  name="otp"
+                  component="p"
+                  className="text-red-500 text-xs mt-1"
+                />
+              </div>
 
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setOtpStep(false)}
-              className="w-1/2 py-3 text-sm font-medium text-gray-600 border border-gray-400 rounded-lg hover:bg-gray-50"
-            >
-              Back
-            </button>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setOtpStep(false)}
+                  className="w-1/2 py-3 text-sm font-medium text-gray-600 border border-gray-400 rounded-lg hover:bg-gray-50"
+                >
+                  Back
+                </button>
 
-            <button
-              onClick={handleVerifyOtp}
-              className="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700"
-            >
-              Register
-            </button>
-          </div>
-        </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700"
+                >
+                  {isSubmitting ? "Verifying..." : "Register"}
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
       )}
     </div>
   );

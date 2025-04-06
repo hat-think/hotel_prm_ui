@@ -19,6 +19,9 @@ export const COLOR_CODES: any = {
 };
 
 export const STRINGS = {
+  COMMON: {
+    SUCCESS_STATUS_CODES: [200, 201, 202, 204, "200", "201", "202", "204"],
+  },
   AUTH: {
     LOGIN: "Login",
     REGISTER: "Register",

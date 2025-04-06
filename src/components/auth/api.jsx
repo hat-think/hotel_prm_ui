@@ -1,18 +1,20 @@
 import axios from "axios";
 import * as Yup from "yup";
+import { saveToStorage } from "../../utilities/utils";
+import { ApiCaller } from "./../../utilities/network";
 
-const API_BASE_URL = "http://142.93.220.8:5000/api/"; // Replace with your actual API URL
+const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}login`, {
+    const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
       email,
       password,
     });
     const res = response.data;
     if (res.status === 1) {
-      localStorage.setItem("token", response.data.token);
-      return response.data ;
+      saveToStorage("token", response.data.token);
+      return response.data;
     } else {
       return response.data;
     }
@@ -25,12 +27,12 @@ export const loginUser = async (email, password) => {
 };
 
 export const sendOtp = async (email) => {
-  return axios.post("/api/send-otp", { email });
+  return ApiCaller.post("/api/send-otp", { email });
 };
 
 export const verifyOtp = async (email, otp) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, {
+    const response = await ApiCaller.post(`${API_BASE_URL}/auth/verify-otp`, {
       email,
       otp,
     });
@@ -43,11 +45,11 @@ export const verifyOtp = async (email, otp) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/register`,
+    const response = await ApiCaller.post(
+      `${API_BASE_URL}/hotelregistration`,
       userData
     );
-    return response.data;
+    return response;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Registration failed");
   }
