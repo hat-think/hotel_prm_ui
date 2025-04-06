@@ -3,7 +3,6 @@ import { getFromStorage } from "../../utilities/utils";
 import { useNavigate } from "react-router-dom";
 
 const AuthLayout = ({ children }) => {
-  const token = getFromStorage("token");
   const navigate = useNavigate();
 
   useEffect(() => {
