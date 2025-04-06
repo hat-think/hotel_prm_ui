@@ -1,9 +1,13 @@
-import React from 'react';
-import { User, ShoppingCart, BarChart, TrendingUp } from 'lucide-react';
+import React from "react";
+import { User, ShoppingCart, BarChart, TrendingUp } from "lucide-react";
 
 const Sidebar = ({ isExpanded }) => {
   return (
-    <div className={`bg-gray-900 text-white h-screen p-4 ${isExpanded ? 'w-64' : 'w-20'} transition-all`}>
+    <div
+      className={`bg-gray-900 text-white h-screen p-4 ${
+        isExpanded ? "w-64" : "w-20"
+      } transition-all`}
+    >
       <div className="flex items-center justify-between mb-6">
         <span className="text-xl font-bold">Xintra</span>
       </div>
