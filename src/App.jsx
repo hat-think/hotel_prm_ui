@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-// import Profile from "./pages/Profile";
+import AddRoom from "./pages/Room/AddRoom";
 // import Settings from "./pages/Settings";
 // import NotFound from "./pages/NotFound";
 
@@ -16,6 +16,7 @@ const App = () => {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/room/add-room" element={<AddRoom />} />
         {/* <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} /> */}
         {/* <Route path="*" element={<NotFound />} /> */}

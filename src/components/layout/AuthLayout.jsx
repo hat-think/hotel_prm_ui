@@ -3,14 +3,18 @@ import { getFromStorage } from "../../utilities/utils";
 import { useNavigate } from "react-router-dom";
 
 const AuthLayout = ({ children }) => {
-  const token = getFromStorage("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token) {
-      navigate("/dashboard");
-    }
-  }, [token]);
+    const checkAuth = async () => {
+      const token = await getAuthToken();
+      if (token) {
+        navigate("/dashboard");
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <div className="flex flex-col-reverse md:flex-row min-h-screen font-body">

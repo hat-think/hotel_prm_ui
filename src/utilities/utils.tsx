@@ -80,3 +80,13 @@ export const getFromStorage = async (key: string) => {
   if (!encrypted) return null;
   return await decryptData(encrypted);
 };
+
+export const getAuthToken = async (): Promise<string | null> => {
+  try {
+    const token = await getFromStorage("token");
+    return token || null;
+  } catch (error) {
+    console.error("Failed to retrieve auth token:", error);
+    return null;
+  }
+};

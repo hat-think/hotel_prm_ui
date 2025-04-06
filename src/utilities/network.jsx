@@ -12,8 +12,10 @@ export const ApiCaller = axios.create({
 });
 
 ApiCaller.interceptors.request.use(
-  (config) => {
-    const access_token = getFromStorage("token");
+  async (config) => {
+    const access_token = await getFromStorage("token"); // wait for token
+    console.log(access_token, "access_token");
+
     if (access_token) {
       config.headers["Authorization"] = "Bearer " + access_token;
     }
@@ -32,10 +34,10 @@ ApiCaller.interceptors.response.use(
       if (error?.response?.status === 401 && !originalRequest?._retry) {
         if (error?.response?.status === 401) {
           //   notifyError(error?.response?.data?.message);
-          setTimeout(() => {
-            localStorage.clear();
-            window.location.href = "/";
-          }, 2000);
+          // setTimeout(() => {
+          //   localStorage.clear();
+          //   window.location.href = "/";
+          // }, 2000);
         }
       } else {
         reject(error?.response);
