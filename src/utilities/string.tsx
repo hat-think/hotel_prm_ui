@@ -20,7 +20,7 @@ export const COLOR_CODES: any = {
 
 export const STRINGS = {
   COMMON: {
-    SUCCESS_STATUS_CODES: [200, 201, 202, 204, "200", "201", "202", "204"],
+    SUCCESS_STATUS_CODES: [200, "200"],
   },
   AUTH: {
     LOGIN: "Login",

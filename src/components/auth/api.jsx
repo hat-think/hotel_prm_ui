@@ -1,10 +1,10 @@
-import axios from "axios";
-import * as Yup from "yup";
-import { saveToStorage } from "../../utilities/utils";
+import { saveToStorage,getFromStorage } from "../../utilities/utils";
 import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
+  const token =await getFromStorage("token");
+  console.log("token",token)
 export const loginUser = async (email, password) => {
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
@@ -54,3 +54,18 @@ export const registerUser = async (userData) => {
     throw new Error(error.response?.data?.message || "Registration failed");
   }
 };
+
+export const getdashboard = async () => {
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/getdashboard-data`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    return response;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
