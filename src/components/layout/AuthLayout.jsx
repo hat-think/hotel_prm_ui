@@ -7,10 +7,15 @@ const AuthLayout = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token) {
-      navigate("/dashboard");
-    }
-  }, [token]);
+    const checkAuth = async () => {
+      const token = await getAuthToken();
+      if (token) {
+        navigate("/dashboard");
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <div className="flex flex-col-reverse md:flex-row min-h-screen font-body">
