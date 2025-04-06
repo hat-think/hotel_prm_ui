@@ -5,9 +5,8 @@ import { registerSchema, otpSchema } from "./validation";
 import { registerUser, verifyOtp } from "./api";
 import { STRINGS } from "../../utilities/string";
 import { Eye, EyeOff } from "lucide-react";
-import AuthLayout from "../../components/layout/AuthLayout";
 
-const RegisterForm: React.FC = () => {
+const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,14 +16,14 @@ const RegisterForm: React.FC = () => {
     mobile: "",
   });
   const [otp, setOtp] = useState("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { AUTH } = STRINGS;
 
-  const handleRegister = async (values: typeof formData) => {
+  const handleRegister = async (values) => {
     setFormData(values);
     try {
-      const res: any = await registerUser(values);
+      const res = await registerUser(values);
       if (res?.data?.success) {
         setOtpStep(true);
       } else {
@@ -37,14 +36,14 @@ const RegisterForm: React.FC = () => {
 
   const handleVerifyOtp = async () => {
     try {
-      await otpSchema.validate({ otp }); // ✅ Validate OTP input
-      const res: any = await verifyOtp(formData.email, otp);
+      await otpSchema.validate({ otp });
+      const res = await verifyOtp(formData.email, otp);
       if (res?.data?.success) {
         navigate("/dashboard");
       } else {
         setError(res?.data?.message || "OTP verification failed.");
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(err?.message || "Invalid OTP.");
     }
   };

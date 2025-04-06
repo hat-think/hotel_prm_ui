@@ -4,17 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "./api";
 import { loginSchema } from "./validation";
 import { STRINGS } from "../../utilities/string";
-import AuthLayout from "../layout/AuthLayout";
+import AuthLayout from "../layout/AuthLayout"; // If unused, you can remove this import
 
-const LoginForm: React.FC = () => {
-  const [error, setError] = useState<string>("");
+const LoginForm = () => {
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { AUTH } = STRINGS;
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  const handleLogin = async (values) => {
     try {
       const response = await loginUser(values.email, values.password);
-      if (response?.data?.success) {
+      if (response?.status==1) {
         navigate("/dashboard");
       } else {
         setError(AUTH.INVALID_CREDENTIALS);

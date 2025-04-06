@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const MainLayout: React.FC<LayoutProps> = ({ children }) => {
+const MainLayout = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleSidebar = () => {
