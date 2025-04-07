@@ -10,8 +10,9 @@ import {
   Receipt,
   Users,
   Contact,
+  LogOut,
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
 // Menu config
@@ -28,7 +29,6 @@ const menuItems = [
       { label: "Add Room", route: "/room/add-room", icon: Package },
       { label: "Book Room", route: "/room/book-room", icon: Receipt },
       { label: "View Room", route: "/room/room-view", icon: Receipt },
-
     ],
   },
   {
@@ -48,8 +48,10 @@ const menuItems = [
 
 const Sidebar = ({ isSideMenuOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedParent, setExpandedParent] = useState("");
   const [hoveredParent, setHoveredParent] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
   useEffect(() => {
     const current = menuItems.find((item) => {
@@ -66,6 +68,12 @@ const Sidebar = ({ isSideMenuOpen }) => {
 
   const toggleExpand = (label) => {
     setExpandedParent((prev) => (prev === label ? "" : label));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Or sessionStorage if you're using that
+    setIsLoggedIn(false);
+    navigate("/login");
   };
 
   return (
@@ -130,7 +138,6 @@ const Sidebar = ({ isSideMenuOpen }) => {
                   ))}
               </button>
 
-              {/* Submenu when sidebar is open */}
               {isSideMenuOpen && item.children && (
                 <ul
                   className={clsx(
@@ -164,7 +171,6 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 </ul>
               )}
 
-              {/* Submenu on hover when sidebar is closed */}
               {!isSideMenuOpen &&
                 item.children &&
                 hoveredParent === item.label && (
@@ -196,6 +202,20 @@ const Sidebar = ({ isSideMenuOpen }) => {
           );
         })}
       </ul>
+
+      {/* Logout Button */}
+      {isLoggedIn && (
+  <div className="absolute bottom-4 w-full left-0 px-4">
+    <button
+      onClick={handleLogout}
+      className="w-full flex items-center gap-3 p-3 rounded-md text-sm bg-red-600 hover:bg-red-700 transition-colors duration-300 text-white"
+    >
+      <LogOut size={18} />
+      {isSideMenuOpen && <span>Logout</span>}
+    </button>
+  </div>
+)}
+
     </div>
   );
 };

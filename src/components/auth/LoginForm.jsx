@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "./api";
+import { loginUser } from "./api"; // Make sure this returns token
 import { loginSchema } from "./validation";
 import { STRINGS } from "../../utilities/string";
-import AuthLayout from "../layout/AuthLayout"; // If unused, you can remove this import
 
 const LoginForm = () => {
   const [error, setError] = useState("");
@@ -14,7 +13,7 @@ const LoginForm = () => {
   const handleLogin = async (values) => {
     try {
       const response = await loginUser(values.email, values.password);
-      if (response?.status==1) {
+      if (response?.status === 1 && response.token) {
         navigate("/dashboard");
       } else {
         setError(AUTH.INVALID_CREDENTIALS);

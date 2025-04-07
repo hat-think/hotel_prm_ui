@@ -5,25 +5,49 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AddRoom from "./pages/Room/AddRoom";
 import ViewRoom from "./pages/Room/ViewRoom";
-
-// import Settings from "./pages/Settings";
-// import NotFound from "./pages/NotFound";
+import PrivateRoute from "./utilities/PrivateRoute"; // Import it
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/" element={<Dashboard />} />
-
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/room/add-room" element={<AddRoom />} />
-        <Route path="/room/room-view" element={<ViewRoom />} />
 
-        {/* <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} /> */}
-        {/* <Route path="*" element={<NotFound />} /> */}
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/room/add-room"
+          element={
+            <PrivateRoute>
+              <AddRoom />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/room/room-view"
+          element={
+            <PrivateRoute>
+              <ViewRoom />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );

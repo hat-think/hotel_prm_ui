@@ -1,7 +1,9 @@
 // cryptoUtils.ts
+
 const TEXT_ENCODER = new TextEncoder();
 const TEXT_DECODER = new TextDecoder();
 const STORAGE_KEY = "encryption-secret-v1"; // Can be rotated
+const TOKEN_KEY = "token";
 
 // Helper to generate a key from a passphrase
 const getKey = async (passphrase: string) => {
@@ -80,12 +82,22 @@ export const getFromStorage = async (key: string) => {
   return await decryptData(encrypted);
 };
 
+// 🔐 Auth helpers
+
 export const getAuthToken = async (): Promise<string | null> => {
   try {
-    const token = await getFromStorage("token");
+    const token = await getFromStorage(TOKEN_KEY);
     return token || null;
   } catch (error) {
     console.error("Failed to retrieve auth token:", error);
     return null;
   }
+};
+
+export const setAuthToken = async (token: string) => {
+  await saveToStorage(TOKEN_KEY, token);
+};
+
+export const removeAuthToken = () => {
+  localStorage.removeItem(TOKEN_KEY);
 };
