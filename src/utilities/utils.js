@@ -27,7 +27,6 @@ export const saveToStorage = (key, value) => {
   localStorage.setItem(key, encrypted);
 };
 
-// Get from localStorage
 export const getFromStorage = (key) => {
   const encrypted = localStorage.getItem(key);
   return decryptData(encrypted);
@@ -45,3 +44,4 @@ export const setAuthToken = (token) => {
 export const removeAuthToken = () => {
   localStorage.removeItem(TOKEN_KEY);
 };
+
