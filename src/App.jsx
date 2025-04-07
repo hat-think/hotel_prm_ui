@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AddRoom from "./pages/Room/AddRoom";
 import ViewRoom from "./pages/Room/ViewRoom";
+import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./utilities/PrivateRoute"; // Import it
 
 const App = () => {
@@ -41,10 +42,18 @@ const App = () => {
           }
         />
         <Route
-          path="/room/room-view"
+          path="/room/view"
           element={
             <PrivateRoute>
               <ViewRoom />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ProfilePage"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
             </PrivateRoute>
           }
         />

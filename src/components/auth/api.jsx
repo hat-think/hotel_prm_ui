@@ -1,9 +1,8 @@
 import { saveToStorage,getFromStorage } from "../../utilities/utils";
 import { ApiCaller } from "./../../utilities/network";
 
-const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
+const API_BASE_URL = "https://log.tokame.network/api"; // Replace with your actual API URL
 
-  const token =await getFromStorage("token");
 export const loginUser = async (email, password) => {
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
@@ -55,6 +54,7 @@ export const registerUser = async (userData) => {
 };
 
 export const getdashboard = async () => {
+  const token =await getFromStorage("token");
 
   try {
     const response = await ApiCaller.get(`${API_BASE_URL}/getdashboard-data`, {
@@ -69,6 +69,7 @@ export const getdashboard = async () => {
 };
 
 export const gethotelrooms = async () => {
+  const token =await getFromStorage("token");
 
   try {
     const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`, {
@@ -79,6 +80,53 @@ export const gethotelrooms = async () => {
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
+export const getProfile = async () => {
+  const token =await getFromStorage("token");
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/getProfile`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
+export const sendemailotp = async () => {
+  const token =await getFromStorage("token");
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/sendemail-otp`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
+export const changepassword = async (userData) => {
+  const token =await getFromStorage("token");
+  try {
+    const response = await ApiCaller.post(
+      `${API_BASE_URL}/changepassword`,
+      userData,{
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Registration failed");
   }
 };
 

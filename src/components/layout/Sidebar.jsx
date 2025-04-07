@@ -28,7 +28,7 @@ const menuItems = [
     children: [
       { label: "Add Room", route: "/room/add-room", icon: Package },
       { label: "Book Room", route: "/room/book-room", icon: Receipt },
-      { label: "View Room", route: "/room/room-view", icon: Receipt },
+      { label: "View Room", route: "/room/view", icon: Receipt },
     ],
   },
   {
@@ -71,7 +71,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Or sessionStorage if you're using that
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
     navigate("/login");
   };
@@ -84,7 +84,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
       )}
       style={{ overflowX: "visible", overflowY: "auto" }}
     >
-      {/* Logo or Icon */}
+      {/* Logo */}
       <div className="flex items-center justify-center mb-8">
         {isSideMenuOpen ? (
           <h1 className="text-2xl font-bold">Hotel CRM</h1>
@@ -115,29 +115,48 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 !isSideMenuOpen && item.children && setHoveredParent("")
               }
             >
-              <button
-                type="button"
-                onClick={() =>
-                  isSideMenuOpen && item.children && toggleExpand(item.label)
-                }
-                className={clsx(
-                  "w-full flex items-center justify-between p-3 rounded-md text-left hover:bg-gray-800 transition-colors duration-300",
-                  isActive && "bg-gray-800"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon size={20} />
-                  {isSideMenuOpen && <span>{item.label}</span>}
-                </div>
-                {isSideMenuOpen &&
-                  item.children &&
-                  (isParentActive ? (
-                    <ChevronUp size={18} />
-                  ) : (
-                    <ChevronDown size={18} />
-                  ))}
-              </button>
+              {/* Direct route items like Dashboard or Analytics */}
+              {item.route ? (
+                <NavLink
+                  to={item.route}
+                  className={({ isActive }) =>
+                    clsx(
+                      "w-full flex items-center justify-between p-3 rounded-md text-left hover:bg-gray-800 transition-colors duration-300",
+                      (isActive || isActive) && "bg-gray-800"
+                    )
+                  }
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={20} />
+                    {isSideMenuOpen && <span>{item.label}</span>}
+                  </div>
+                </NavLink>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    isSideMenuOpen && item.children && toggleExpand(item.label)
+                  }
+                  className={clsx(
+                    "w-full flex items-center justify-between p-3 rounded-md text-left hover:bg-gray-800 transition-colors duration-300",
+                    isActive && "bg-gray-800"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={20} />
+                    {isSideMenuOpen && <span>{item.label}</span>}
+                  </div>
+                  {isSideMenuOpen &&
+                    item.children &&
+                    (isParentActive ? (
+                      <ChevronUp size={18} />
+                    ) : (
+                      <ChevronDown size={18} />
+                    ))}
+                </button>
+              )}
 
+              {/* Dropdown - children */}
               {isSideMenuOpen && item.children && (
                 <ul
                   className={clsx(
@@ -171,6 +190,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 </ul>
               )}
 
+              {/* Hover dropdown for collapsed sidebar */}
               {!isSideMenuOpen &&
                 item.children &&
                 hoveredParent === item.label && (
@@ -203,19 +223,18 @@ const Sidebar = ({ isSideMenuOpen }) => {
         })}
       </ul>
 
-      {/* Logout Button */}
+      {/* Logout */}
       {isLoggedIn && (
-  <div className="absolute bottom-4 w-full left-0 px-4">
-    <button
-      onClick={handleLogout}
-      className="w-full flex items-center gap-3 p-3 rounded-md text-sm bg-red-600 hover:bg-red-700 transition-colors duration-300 text-white"
-    >
-      <LogOut size={18} />
-      {isSideMenuOpen && <span>Logout</span>}
-    </button>
-  </div>
-)}
-
+        <div className="absolute bottom-4 w-full left-0 px-4">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 p-3 rounded-md text-sm bg-red-600 hover:bg-red-700 transition-colors duration-300 text-white"
+          >
+            <LogOut size={18} />
+            {isSideMenuOpen && <span>Logout</span>}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
