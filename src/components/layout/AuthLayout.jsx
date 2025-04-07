@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { getAuthToken } from "../../utilities/utils";
+import { getAuthToken } from "../../utilities/utils.js";
 import { useNavigate } from "react-router-dom";
 
 const AuthLayout = ({ children }) => {
@@ -50,8 +50,12 @@ const AuthLayout = ({ children }) => {
                 className="w-8 h-8"
               />
               <div className="text-left leading-tight">
-                <p className="text-xs text-gray-700 font-medium">Download our</p>
-                <p className="text-sm text-gray-900 font-bold">Mobile App Now</p>
+                <p className="text-xs text-gray-700 font-medium">
+                  Download our
+                </p>
+                <p className="text-sm text-gray-900 font-bold">
+                  Mobile App Now
+                </p>
               </div>
             </div>
           </div>

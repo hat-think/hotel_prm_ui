@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getFromStorage } from "./utils";
+import { getFromStorage } from "./utils.js";
 const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
 export const ApiCaller = axios.create({
@@ -13,7 +13,7 @@ export const ApiCaller = axios.create({
 
 ApiCaller.interceptors.request.use(
   async (config) => {
-    const access_token = await getFromStorage("token"); // wait for token
+    const access_token = getFromStorage("token");
     if (access_token) {
       config.headers["Authorization"] = "Bearer " + access_token;
     }

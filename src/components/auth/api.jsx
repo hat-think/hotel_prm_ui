@@ -1,9 +1,9 @@
-import { saveToStorage,getFromStorage } from "../../utilities/utils";
+import { saveToStorage, getFromStorage } from "../../utilities/utils.js";
 import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
-  const token =await getFromStorage("token");
+const token = getFromStorage("token");
 export const loginUser = async (email, password) => {
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
@@ -55,7 +55,6 @@ export const registerUser = async (userData) => {
 };
 
 export const getdashboard = async () => {
-
   try {
     const response = await ApiCaller.get(`${API_BASE_URL}/getdashboard-data`, {
       headers: {
@@ -64,22 +63,19 @@ export const getdashboard = async () => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+    throw new Error(
+      error.response?.data?.message || "Fetching dashboard data failed"
+    );
   }
 };
 
 export const gethotelrooms = async () => {
-
   try {
-    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-      },
-    });
+    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+    throw new Error(
+      error.response?.data?.message || "Fetching dashboard data failed"
+    );
   }
 };
-
-
