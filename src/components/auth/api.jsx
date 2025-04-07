@@ -3,10 +3,6 @@ import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "https://log.tokame.network/api"; // Replace with your actual API URL
 
-<<<<<<< HEAD
-=======
-const token = getFromStorage("token");
->>>>>>> 26eef176ef4dbb2a2ebdf3113a509e454e5fe1be
 export const loginUser = async (email, password) => {
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
