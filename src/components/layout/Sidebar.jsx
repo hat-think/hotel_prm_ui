@@ -27,6 +27,8 @@ const menuItems = [
     children: [
       { label: "Add Room", route: "/room/add-room", icon: Package },
       { label: "Book Room", route: "/room/book-room", icon: Receipt },
+      { label: "View Room", route: "/room/room-view", icon: Receipt },
+
     ],
   },
   {

@@ -68,3 +68,18 @@ export const getdashboard = async () => {
   }
 };
 
+export const gethotelrooms = async () => {
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
+
