@@ -1,4 +1,4 @@
-import { saveToStorage, getFromStorage } from "../../utilities/utils.js";
+import { saveToStorage,getFromStorage } from "../../utilities/utils";
 import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "https://log.tokame.network/api"; // Replace with your actual API URL
@@ -54,11 +54,8 @@ export const registerUser = async (userData) => {
 };
 
 export const getdashboard = async () => {
-<<<<<<< HEAD
   const token =await getFromStorage("token");
 
-=======
->>>>>>> 26eef176ef4dbb2a2ebdf3113a509e454e5fe1be
   try {
     const response = await ApiCaller.get(`${API_BASE_URL}/getdashboard-data`, {
       headers: {
@@ -67,28 +64,24 @@ export const getdashboard = async () => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Fetching dashboard data failed"
-    );
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
   }
 };
 
 export const gethotelrooms = async () => {
-<<<<<<< HEAD
   const token =await getFromStorage("token");
 
-=======
->>>>>>> 26eef176ef4dbb2a2ebdf3113a509e454e5fe1be
   try {
-    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`);
+    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Fetching dashboard data failed"
-    );
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
   }
 };
-<<<<<<< HEAD
 
 export const getProfile = async () => {
   const token =await getFromStorage("token");
@@ -137,6 +130,3 @@ export const changepassword = async (userData) => {
   }
 };
 
-
-=======
->>>>>>> 26eef176ef4dbb2a2ebdf3113a509e454e5fe1be
