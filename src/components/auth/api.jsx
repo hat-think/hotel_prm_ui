@@ -4,7 +4,6 @@ import { ApiCaller } from "./../../utilities/network";
 const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
   const token =await getFromStorage("token");
-  console.log("token",token)
 export const loginUser = async (email, password) => {
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/login`, {
@@ -63,7 +62,7 @@ export const getdashboard = async () => {
         Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
       },
     });
-    return response;
+    return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
   }

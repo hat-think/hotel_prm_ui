@@ -76,7 +76,6 @@ export const saveToStorage = async (key: string, value: any) => {
 
 export const getFromStorage = async (key: string) => {
   const encrypted = localStorage.getItem(key);
-  console.log("encrypted",encrypted)
   if (!encrypted) return null;
   return await decryptData(encrypted);
 };

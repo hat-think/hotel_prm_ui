@@ -1,6 +1,30 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import { FaEllipsisV } from "react-icons/fa";
+import { getdashboard } from "../components/auth/api";
+
+const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState({
+    totalVisitors: 0,
+    currentVisitors: 0,
+    totalRooms: 0,
+    availableRooms: 0,
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getdashboard();
+        if (response.status === 1) {
+          setDashboardData(response.result);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const stats = [
     {
@@ -37,14 +61,11 @@ import { FaEllipsisV } from "react-icons/fa";
     },
   ];
 
-const Dashboard = () => {
   return (
     <MainLayout>
       <div className="p-6">
         <h1 className="text-2xl font-bold">Sales Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome to your dashboard. Check your stats below.
-        </p>
+        <p className="text-gray-600">Welcome to your dashboard. Check your stats below.</p>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((item, index) => (
@@ -52,17 +73,12 @@ const Dashboard = () => {
               key={index}
               className={`bg-white border ${item.borderColor} rounded-lg p-6 shadow-sm relative`}
             >
-              <div className="text-gray-600 text-sm font-medium mb-2">
-                {item.title}
-              </div>
-              <div className={`text-5xl font-semibold ${item.color}`}>
-                {item.count}
-              </div>
-              <div className={`mt-2 ${item.color} font-medium`}>
-                {item.title}
-              </div>
+              <div className="text-gray-600 text-sm font-medium mb-2">{item.title}</div>
+              <div className={`text-5xl font-semibold ${item.color}`}>{item.count}</div>
+              <div className={`mt-2 ${item.color} font-medium`}>{item.title}</div>
               <div className="text-sm text-gray-500 mt-1">
-                {item.subtitle}: <span className="font-semibold text-gray-800">{item.subcount}</span>
+                {item.subtitle}:{" "}
+                <span className="font-semibold text-gray-800">{item.subcount}</span>
               </div>
               <div className="absolute top-4 right-4 text-gray-400 cursor-pointer">
                 <FaEllipsisV />

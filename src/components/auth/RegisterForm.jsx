@@ -28,7 +28,6 @@ const RegisterForm = () => {
           phone: values.phone,
         },
       });
-      console.log(res, "res");
       if (res?.data?.status === 1) {
         setOtpStep(true);
         setError("");

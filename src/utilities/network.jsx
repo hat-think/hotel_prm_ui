@@ -14,8 +14,6 @@ export const ApiCaller = axios.create({
 ApiCaller.interceptors.request.use(
   async (config) => {
     const access_token = await getFromStorage("token"); // wait for token
-    console.log(access_token, "access_token");
-
     if (access_token) {
       config.headers["Authorization"] = "Bearer " + access_token;
     }
