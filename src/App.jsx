@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AddRoom from "./pages/Room/AddRoom";
 import ViewRoom from "./pages/Room/ViewRoom";
+import BookedRoom from "./pages/Room/BookedRoom";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./utilities/PrivateRoute"; // Import it
 
@@ -46,6 +47,14 @@ const App = () => {
           element={
             <PrivateRoute>
               <ViewRoom />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/room/Booked-Room"
+          element={
+            <PrivateRoute>
+              <BookedRoom />
             </PrivateRoute>
           }
         />

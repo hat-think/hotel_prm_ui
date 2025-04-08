@@ -26,3 +26,36 @@ export const bulkAddRoomsAPI = async (data) => {
     };
   }
 };
+
+export const gethotelrooms = async () => {
+  const token =await getFromStorage("token");
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/gethotel-rooms`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching dashboard data failed");
+  }
+};
+
+export const getactivevisitor = async (page = 1, limit = 20) => {
+  const token = await getFromStorage("token");
+
+  try {
+    const response = await ApiCaller.get(
+      `${API_BASE_URL}/getactive-visitor?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching active visitors failed");
+  }
+};
