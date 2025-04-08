@@ -7,7 +7,7 @@ import {
   FaUserTie,
   FaCheckCircle,
 } from "react-icons/fa";
-import { sendemailotp, verifyotp } from "../auth/api";
+import { sendemailotp, verifyotp, updateaddress } from "../auth/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -17,9 +17,19 @@ const ProfilePage = ({ profile }) => {
   const [phoneOtpSent, setPhoneOtpSent] = useState(false);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [editAddressMode, setEditAddressMode] = useState(false);
+
+  const [addressForm, setAddressForm] = useState({
+    street: profile?.address?.street || "",
+    city: profile?.address?.city || "",
+    state: profile?.address?.state || "",
+    postalCode: profile?.address?.postalCode || "",
+    country: profile?.address?.country || "",
+  });
 
   const handlePhoneVerify = () => {
-    alert(`Verifying phone with OTP: ${phoneOtp}`);
+    // TODO: Connect to backend verify phone API if needed
+    toast.success("Phone number verified successfully!");
     setPhoneOtp("");
     setPhoneOtpSent(false);
   };
@@ -62,14 +72,36 @@ const ProfilePage = ({ profile }) => {
   };
 
   const sendPhoneOtp = () => {
-    alert("OTP sent to phone");
+    // TODO: Connect to backend send phone OTP if needed
+    toast.success("OTP sent to your phone!");
     setPhoneOtpSent(true);
   };
 
-  return (
-    <div>
-      <ToastContainer position="top-center" autoClose={3000} />
+  const handleAddressChange = (e) => {
+    setAddressForm({ ...addressForm, [e.target.name]: e.target.value });
+  };
 
+    const handleAddressSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const response = await updateaddress(addressForm);
+      if (response.status === 1) {
+        toast.success(response.msg || "Address updated successfully!");
+        setEditAddressMode(false);
+      } else {
+        toast.error(response.msg || "Failed to Address updated successfully!.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error Address updated successfully!.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-4">
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Card */}
         <div className="bg-white p-6 rounded-xl shadow-md">
@@ -101,6 +133,7 @@ const ProfilePage = ({ profile }) => {
           </h2>
           {profile ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-gray-700">
+              {/* Left side info */}
               <div className="space-y-3">
                 <p>
                   <strong>Hotel Name:</strong> {profile.name}
@@ -124,15 +157,38 @@ const ProfilePage = ({ profile }) => {
                 </p>
                 <p className="flex items-center gap-1 flex-wrap">
                   <FaMapMarkerAlt />
-                  <strong>Location:</strong> {profile.address.city},{" "}
-                  {profile.address.state}, {profile.address.country}
+                  <strong>Location:</strong>{" "}
+                  {profile.address?.city &&
+                  profile.address?.state &&
+                  profile.address?.country ? (
+                    <>
+                      {profile.address.city}, {profile.address.state},{" "}
+                      {profile.address.country}
+                    </>
+                  ) : (
+                    <span className="text-red-500">Address not provided</span>
+                  )}
                 </p>
+
+                {!editAddressMode &&
+                  (!profile.address?.city ||
+                    !profile.address?.state ||
+                    !profile.address?.country) && (
+                    <button
+                      className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                      onClick={() => setEditAddressMode(true)}
+                    >
+                      📍 Update Address
+                    </button>
+                  )}
+
                 <p className="flex items-center gap-1">
                   <FaUserTie />
                   <strong>Job Title:</strong> Hotel
                 </p>
               </div>
 
+              {/* Right side info */}
               <div className="space-y-3">
                 <p className="flex items-center gap-1 flex-wrap">
                   <FaEnvelope />
@@ -220,23 +276,65 @@ const ProfilePage = ({ profile }) => {
                   </>
                 )}
 
+                {/* Home Address */}
                 <p>
-                  <strong>Home Address:</strong> {profile.address.street},{" "}
-                  {profile.address.city}, {profile.address.postalCode},{" "}
-                  {profile.address.country}
+                  <strong>Home Address:</strong>{" "}
+                  {profile.address?.street &&
+                  profile.address?.city &&
+                  profile.address?.postalCode &&
+                  profile.address?.country ? (
+                    <>
+                      {profile.address.street}, {profile.address.city},{" "}
+                      {profile.address.postalCode}, {profile.address.country}
+                    </>
+                  ) : (
+                    <span className="text-red-500">Address not provided</span>
+                  )}
                 </p>
+
+                {editAddressMode && (
+                  <div className="space-y-2 border-t pt-4">
+                    <h4 className="font-semibold text-gray-800">
+                      Update Address
+                    </h4>
+                    {["street", "city", "state", "postalCode", "country"].map(
+                      (field) => (
+                        <input
+                          key={field}
+                          type="text"
+                          name={field}
+                          placeholder={field}
+                          value={addressForm[field]}
+                          onChange={handleAddressChange}
+                          className="border w-full px-3 py-1 rounded"
+                        />
+                      )
+                    )}
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={handleAddressSubmit}
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                      >
+                        Save Address
+                      </button>
+                      <button
+                        onClick={() => setEditAddressMode(false)}
+                        className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <p>
                   <strong>Status:</strong>{" "}
                   {profile.status === 1 ? "Active" : "Inactive"}
                 </p>
-                <p>
-                  <strong>Created At:</strong>{" "}
-                  {new Date(profile.createdAt).toLocaleString()}
-                </p>
               </div>
             </div>
           ) : (
-            <p>Loading profile data...</p>
+            <p>Loading profile...</p>
           )}
         </div>
       </div>

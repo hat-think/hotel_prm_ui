@@ -145,3 +145,20 @@ export const verifyotp = async (userData) => {
   }
 };
 
+export const updateaddress = async (userData) => {
+  const token =await getFromStorage("token");
+  try {
+    const response = await ApiCaller.post(
+      `${API_BASE_URL}//update-address`,
+      userData,{
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "update failed");
+  }
+};
+
