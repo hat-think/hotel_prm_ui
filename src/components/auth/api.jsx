@@ -130,3 +130,20 @@ export const changepassword = async (userData) => {
   }
 };
 
+export const verifyotp = async (userData) => {
+  const token =await getFromStorage("token");
+  try {
+    const response = await ApiCaller.post(
+      `${API_BASE_URL}/verifyotp`,
+      userData,{
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Registration failed");
+  }
+};
+
