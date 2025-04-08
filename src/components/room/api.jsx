@@ -1,14 +1,18 @@
 import { saveToStorage, getFromStorage } from "../../utilities/utils.js";
 import { ApiCaller } from "./../../utilities/network";
 
-const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
+const API_BASE_URL = "https://log.tokame.network/api"; // Replace with your actual API URL
 
 
 export const bulkAddRoomsAPI = async (data) => {
   const token = await getFromStorage("token");
 
   try {
-    const response = await ApiCaller.post(`${API_BASE_URL}/addrooms`, data);
+     const response = await ApiCaller.post(`${API_BASE_URL}/addrooms`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        });
     const res = response.data;
     if (res.status === 1) {
       return response.data;

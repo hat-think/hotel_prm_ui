@@ -42,7 +42,7 @@ const App = () => {
           }
         />
         <Route
-          path="/room/view"
+          path="/room/room-view"
           element={
             <PrivateRoute>
               <ViewRoom />
