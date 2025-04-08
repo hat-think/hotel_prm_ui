@@ -3,9 +3,10 @@ import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "http://142.93.220.8:5000/api"; // Replace with your actual API URL
 
-const token = await getFromStorage("token");
 
 export const bulkAddRoomsAPI = async (data) => {
+  const token = await getFromStorage("token");
+
   try {
     const response = await ApiCaller.post(`${API_BASE_URL}/addrooms`, data);
     const res = response.data;
