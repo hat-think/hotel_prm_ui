@@ -1,4 +1,4 @@
-import { saveToStorage, getFromStorage } from "../../utilities/utils.js";
+import { getFromStorage } from "../../utilities/utils.js";
 import { ApiCaller } from "./../../utilities/network";
 
 const API_BASE_URL = "https://log.tokame.network/api"; // Replace with your actual API URL

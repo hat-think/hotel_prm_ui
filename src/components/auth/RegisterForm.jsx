@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
 import { registerSchema, otpSchema } from "./validation";
-import { registerUser, verifyOtp } from "./api";
+import { registerUser, verifyOtpregister } from "./api";
 import { Eye, EyeOff } from "lucide-react";
 
 const RegisterForm = () => {
@@ -31,7 +31,7 @@ const RegisterForm = () => {
       if (res?.data?.status === 1) {
         setOtpStep(true);
         setError("");
-      } else if (res?.status === 205) {
+      } else if (res?.status === 201) {
         //Show toast message for already registered user
         navigate("/login");
       } else {
@@ -44,8 +44,12 @@ const RegisterForm = () => {
 
   const handleVerifyOtp = async (values) => {
     try {
-      const res = await verifyOtp(formData.email, values.otp);
-      if (res?.status === 0) {
+      let data={
+        email:formData.email,
+        otp:values.otp
+      }
+      const res = await verifyOtpregister(data);
+      if (res?.status === 1) {
         navigate("/login");
       } else {
         setError(res?.data?.msg || "OTP verification failed.");

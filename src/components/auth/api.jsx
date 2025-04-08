@@ -28,11 +28,9 @@ export const sendOtp = async (email) => {
   return ApiCaller.post("/api/send-otp", { email });
 };
 
-export const verifyOtp = async (email, otp) => {
+export const verifyOtpregister = async (data) => {
   try {
-    const response = await ApiCaller.post(`${API_BASE_URL}/auth/verify-otp`, {
-      email,
-      otp,
+    const response = await ApiCaller.post(`${API_BASE_URL}/verifyOtpregister`,data, {
     });
 
     return response.data;
