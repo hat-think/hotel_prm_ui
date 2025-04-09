@@ -7,43 +7,58 @@ import {
   ChevronDown,
   ChevronUp,
   Package,
+  FilePlus,
+  Eye,
+  CalendarCheck,
   Receipt,
   Users,
   Contact,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
+
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
-// Menu config
+// Icon mapping based on label names
+const iconMap = {
+  Dashboard: BarChart,
+  Room: ShoppingCart,
+  "Add Room": Package,
+  "Book Room": FilePlus,
+  "View Room": Eye,
+  "Booked Room": CalendarCheck,
+  Analytics: TrendingUp,
+  CRM: User,
+  Customers: Users,
+  Leads: Contact,
+  Logout: LogOut,
+};
+
+// Menu config without icon fields
 const menuItems = [
   {
     label: "Dashboard",
-    icon: BarChart,
     route: "/dashboard",
   },
   {
     label: "Room",
-    icon: ShoppingCart,
     children: [
-      { label: "Add Room", route: "/room/add-room", icon: Package },
-      { label: "Book Room", route: "/room/book-room", icon: Receipt },
-      { label: "View Room", route: "/room/room-view", icon: Receipt },
-      { label: "Booked Room", route: "/room/Booked-Room", icon: Receipt },
-
+      { label: "Add Room", route: "/room/add-room" },
+      { label: "Book Room", route: "/room/book-room" },
+      { label: "View Room", route: "/room/room-view" },
+      { label: "Booked Room", route: "/room/Booked-Room" },
     ],
   },
   {
     label: "Analytics",
-    icon: TrendingUp,
     route: "/analytics",
   },
   {
     label: "CRM",
-    icon: User,
     children: [
-      { label: "Customers", route: "/crm/customers", icon: Users },
-      { label: "Leads", route: "/crm/leads", icon: Contact },
+      { label: "Customers", route: "/crm/customers" },
+      { label: "Leads", route: "/crm/leads" },
     ],
   },
 ];
@@ -97,7 +112,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
 
       <ul className="space-y-2">
         {menuItems.map((item) => {
-          const Icon = item.icon;
+          const Icon = iconMap[item.label] || HelpCircle;
           const isDirectRouteActive =
             item.route && location.pathname.startsWith(item.route);
           const isChildActive = item.children?.some((child) =>
@@ -117,7 +132,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 !isSideMenuOpen && item.children && setHoveredParent("")
               }
             >
-              {/* Direct route items like Dashboard or Analytics */}
+              {/* Main item button or navlink */}
               {item.route ? (
                 <NavLink
                   to={item.route}
@@ -158,7 +173,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 </button>
               )}
 
-              {/* Dropdown - children */}
+              {/* Expanded children when sidebar is open */}
               {isSideMenuOpen && item.children && (
                 <ul
                   className={clsx(
@@ -169,7 +184,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
                   )}
                 >
                   {item.children.map((child) => {
-                    const ChildIcon = child.icon;
+                    const ChildIcon = iconMap[child.label] || HelpCircle;
                     return (
                       <li key={child.label}>
                         <NavLink
@@ -192,13 +207,13 @@ const Sidebar = ({ isSideMenuOpen }) => {
                 </ul>
               )}
 
-              {/* Hover dropdown for collapsed sidebar */}
+              {/* Hover dropdown when sidebar is collapsed */}
               {!isSideMenuOpen &&
                 item.children &&
                 hoveredParent === item.label && (
                   <ul className="absolute left-full top-0 ml-2 w-52 bg-gray-800 p-2 rounded-md shadow-xl space-y-1 z-50 min-w-max animate-fade-in">
                     {item.children.map((child) => {
-                      const ChildIcon = child.icon;
+                      const ChildIcon = iconMap[child.label] || HelpCircle;
                       return (
                         <li key={child.label}>
                           <NavLink
@@ -225,7 +240,7 @@ const Sidebar = ({ isSideMenuOpen }) => {
         })}
       </ul>
 
-      {/* Logout */}
+      {/* Logout Button */}
       {isLoggedIn && (
         <div className="absolute bottom-4 w-full left-0 px-4">
           <button

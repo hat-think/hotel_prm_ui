@@ -7,6 +7,7 @@ import AddRoom from "./pages/Room/AddRoom";
 import ViewRoom from "./pages/Room/ViewRoom";
 import BookedRoom from "./pages/Room/BookedRoom";
 import ProfilePage from "./pages/ProfilePage";
+import BookRoom from "./pages/Room/BookRoom";
 import PrivateRoute from "./utilities/PrivateRoute"; // Import it
 
 const App = () => {
@@ -55,6 +56,14 @@ const App = () => {
           element={
             <PrivateRoute>
               <BookedRoom />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/room/Book-Room"
+          element={
+            <PrivateRoute>
+              <BookRoom />
             </PrivateRoute>
           }
         />

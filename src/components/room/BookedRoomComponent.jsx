@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { getactivevisitor } from "./api";
+import { getactivevisitor, checkoutvisitor } from "./api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const ReservationsPage = () => {
   const [reservations, setReservations] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedVisitor, setSelectedVisitor] = useState(null); // For popup
+  const [showModal, setShowModal] = useState(false);
   const limit = 10;
+  const navigate = useNavigate();
 
+  const handleBookRoom = () => {
+    navigate("/room/Book-Room");
+  };
+  
   const fetchReservations = async (page) => {
     try {
       const response = await getactivevisitor(page, limit);
@@ -29,12 +39,47 @@ const ReservationsPage = () => {
     }
   };
 
+  const openCheckoutModal = (visitor) => {
+    setSelectedVisitor(visitor);
+    setShowModal(true);
+  };
+
+  const handleConfirmCheckout = async () => {
+    try {
+      let data = {
+        visitorId: selectedVisitor.visitorId,
+        paidAmount: selectedVisitor.dueAmount,
+      };
+      let response = await checkoutvisitor(data);
+      if (response.status === 1) {
+        toast.success(response.msg || "Visitor checked out successfully.!");
+        setShowModal(false);
+      } else {
+        toast.error(response.msg || "Failed to Visitor checked out.");
+      }
+      fetchReservations(currentPage); // Refresh list
+    } catch (error) {
+      toast.error("Failed to Visitor checked out.");
+
+      console.error("Checkout error:", error);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
-      <h1 className="text-3xl font-bold mb-2 text-gray-800">Booked Room</h1>
-      <p className="text-gray-500 mb-4">
-        Showing {reservations.length} Booked-Room(s)
-      </p>
+      <ToastContainer position="top-center" autoClose={3000} />
+      <h1 className="text-3xl font-bold mb-2 text-gray-800 ">Booked Room</h1>
+      <div className="flex items-center justify-between mb-4">
+  <p className="text-gray-500 ">
+    Showing {reservations.length} Booked-Room(s)
+  </p>
+  <button
+    onClick={handleBookRoom} // Replace with your booking function
+    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
+  >
+    Book Room
+  </button>
+</div>
 
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto shadow rounded-lg border border-gray-200">
@@ -44,8 +89,8 @@ const ReservationsPage = () => {
               <th className="px-6 py-3">ID</th>
               <th className="px-6 py-3">Client</th>
               <th className="px-6 py-3">Room</th>
-              <th className="px-6 py-3">Arrival</th>
-              <th className="px-6 py-3">Departure</th>
+              <th className="px-6 py-3">Check In</th>
+              <th className="px-6 py-3">Check Out</th>
               <th className="px-6 py-3">Payment</th>
               <th className="px-6 py-3">Total</th>
               <th className="px-6 py-3">Paid</th>
@@ -87,10 +132,13 @@ const ReservationsPage = () => {
                   <button className="text-blue-600 hover:text-blue-800 transition">
                     ✏️
                   </button>
-                  <button className="text-red-600 hover:text-red-800 transition">
-                    🗑️
+                  <button className="text-red-800 hover:text-red-800 transition text-sm border border-red-800 rounded px-2 py-1 cursor-pointer">
+                    Cancel
                   </button>
-                  <button className="text-green-600 hover:text-green-800 transition text-sm border border-green-500 rounded px-2 py-1">
+                  <button
+                    onClick={() => openCheckoutModal(reservation)}
+                    className="text-green-600 hover:text-green-800 transition text-sm border border-green-500 rounded px-2 py-1 cursor-pointer"
+                  >
                     Checkout
                   </button>
                 </td>
@@ -101,69 +149,75 @@ const ReservationsPage = () => {
       </div>
 
       {/* Mobile View */}
-    {/* Mobile View */}
-<div className="block md:hidden">
-  <div className="flex flex-col gap-3">
-    {reservations.map((reservation, index) => (
-      <div
-        key={reservation._id}
-        className="bg-white border rounded-lg p-4 shadow-sm text-sm"
-      >
-        <div className="font-semibold text-gray-800 mb-2">
-          #{index + 1 + (currentPage - 1) * limit} — {reservation.name}
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-gray-700 text-sm">
-          <div>
-            <span className="font-medium">Room:</span> {reservation.roomnumber}
-          </div>
-          <div>
-            <span className="font-medium">Payment:</span>{" "}
-            <span
-              className={`${
-                reservation.paymentStatus?.toLowerCase() === "partial"
-                  ? "text-yellow-700"
-                  : "text-green-700"
-              } font-semibold`}
+      <div className="block md:hidden">
+        <div className="flex flex-col gap-3">
+          {reservations.map((reservation, index) => (
+            <div
+              key={reservation._id}
+              className="bg-white border rounded-lg p-4 shadow-sm text-sm"
             >
-              {reservation.paymentStatus?.toUpperCase()}
-            </span>
-          </div>
-          <div>
-            <span className="font-medium">Check In:</span>{" "}
-            {reservation.checkIn?.split("T")[0]}
-          </div>
-          <div>
-            <span className="font-medium">Check Out:</span>{" "}
-            {reservation.checkOut?.split("T")[0]}
-          </div>
-          <div>
-            <span className="font-medium">Total:</span> ₹
-            {reservation.totalAmount || 0}
-          </div>
-          <div>
-            <span className="font-medium">Paid:</span> ₹
-            {reservation.paidAmount || 0}
-          </div>
-          <div className="col-span-2">
-            <span className="font-medium">Due:</span>{" "}
-            <span className="text-red-600 font-semibold">
-              ₹{reservation.dueAmount || 0}
-            </span>
-          </div>
-        </div>
+              <div className="font-semibold text-gray-800 mb-2">
+                #{index + 1 + (currentPage - 1) * limit} — {reservation.name}
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-gray-700 text-sm">
+                <div>
+                  <span className="font-medium">Room:</span>{" "}
+                  {reservation.roomnumber}
+                </div>
+                <div>
+                  <span className="font-medium">Payment:</span>{" "}
+                  <span
+                    className={`${
+                      reservation.paymentStatus?.toLowerCase() === "partial"
+                        ? "text-yellow-700"
+                        : "text-green-700"
+                    } font-semibold`}
+                  >
+                    {reservation.paymentStatus?.toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium">Check In:</span>{" "}
+                  {reservation.checkIn?.split("T")[0]}
+                </div>
+                <div>
+                  <span className="font-medium">Check Out:</span>{" "}
+                  {reservation.checkOut?.split("T")[0]}
+                </div>
+                <div>
+                  <span className="font-medium">Total:</span> ₹
+                  {reservation.totalAmount || 0}
+                </div>
+                <div>
+                  <span className="font-medium">Paid:</span> ₹
+                  {reservation.paidAmount || 0}
+                </div>
+                <div className="col-span-2">
+                  <span className="font-medium">Due:</span>{" "}
+                  <span className="text-red-600 font-semibold">
+                    ₹{reservation.dueAmount || 0}
+                  </span>
+                </div>
+              </div>
 
-        <div className="flex justify-end mt-4 gap-3 text-lg">
-          <button className="text-blue-600 hover:text-blue-800">✏️</button>
-          <button className="text-red-600 hover:text-red-800">🗑️</button>
-          <button className="text-green-600 hover:text-green-800 text-sm border border-green-500 rounded px-2 py-1">
-            Checkout
-          </button>
+              <div className="flex justify-end mt-4 gap-3 text-lg">
+                <button className="text-blue-600 hover:text-blue-800">
+                  ✏️
+                </button>
+                <button className="text-red-600 hover:text-red-800 text-sm border border-red-500 rounded px-2 py-1">
+                  Cancel
+                </button>
+                <button
+                  onClick={() => openCheckoutModal(reservation)}
+                  className="text-green-600 hover:text-green-800 text-sm border border-green-500 rounded px-2 py-1"
+                >
+                  Checkout
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
-
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-6">
@@ -185,6 +239,37 @@ const ReservationsPage = () => {
           Next
         </button>
       </div>
+
+      {/* Checkout Modal */}
+      {showModal && selectedVisitor && (
+        <div className="fixed inset-0  bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-sm">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Confirm Checkout
+            </h2>
+            <p className="mb-2">
+              <strong>Name:</strong> {selectedVisitor.name}
+            </p>
+            <p className="mb-4 text-red-600 font-semibold">
+              <strong>Due Amount:</strong> ₹{selectedVisitor.dueAmount || 0}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmCheckout}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
