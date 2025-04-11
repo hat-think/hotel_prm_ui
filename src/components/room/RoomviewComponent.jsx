@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { gethotelrooms } from "./api"; // Replace with your actual API
+import { gethotelrooms, updateroom } from "./api"; // Replace with your actual API
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,12 +13,7 @@ import {
   PencilLine,
 } from "lucide-react";
 
-// Dummy update function – replace with your actual API call
-const updateRoomDetails = async (id, updatedRoom) => {
-  console.log("Sending update for room", id, updatedRoom);
-  // Example: await axios.put(`/api/rooms/${id}`, updatedRoom);
-  return { success: true };
-};
+
 
 const RoomList = () => {
   const [rooms, setRooms] = useState([]);
@@ -32,6 +27,7 @@ const RoomList = () => {
   const [editType, setEditType] = useState("");
   const [editPrice, setEditPrice] = useState("");
   const [editOccupancy, setEditOccupancy] = useState("");
+  const [editroomnumber, setRoomnumber] = useState("");
 
   useEffect(() => {
     fetchRooms();
@@ -70,6 +66,7 @@ const RoomList = () => {
     setEditType(room.roomType);
     setEditPrice(room.pricePerNight);
     setEditOccupancy(room.maxOccupancy);
+    setRoomnumber(room.roomnumber);
     setIsModalOpen(true);
   };
 
@@ -84,10 +81,12 @@ const RoomList = () => {
       roomType: editType,
       pricePerNight: Number(editPrice),
       maxOccupancy: Number(editOccupancy),
+      roomnumber: Number(editroomnumber),
+
     };
 
-    const res = await updateRoomDetails(editingRoom._id, updatedRoom);
-    if (res.success) {
+    const res = await updateroom(updatedRoom);
+    if (res.status) {
       toast.success("Room updated successfully!");
       handleModalClose();
       fetchRooms(); // refresh list

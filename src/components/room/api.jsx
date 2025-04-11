@@ -114,3 +114,23 @@ export const allocateroom = async (data) => {
     };
   }
 };
+
+export const updateroom = async (data) => {
+  const token = await getFromStorage("token");
+
+  try {
+     const response = await ApiCaller.post(`${API_BASE_URL}/update-room`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        });
+
+      return response.data;
+   
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || "An error occurred",
+    };
+  }
+};
