@@ -3,6 +3,19 @@ import { getactivevisitor, checkoutvisitor } from "./api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import {
+  Hash,
+  User,
+  Bed,
+  CalendarCheck,
+  CalendarX,
+  CreditCard,
+  FileText,
+  Wallet,
+  CheckCircle,
+  AlertCircle,
+  MoreVertical,
+} from "lucide-react";
 
 const ReservationsPage = () => {
   const [reservations, setReservations] = useState([]);
@@ -16,7 +29,7 @@ const ReservationsPage = () => {
   const handleBookRoom = () => {
     navigate("/room/Book-Room");
   };
-  
+
   const fetchReservations = async (page) => {
     try {
       const response = await getactivevisitor(page, limit);
@@ -70,32 +83,52 @@ const ReservationsPage = () => {
       <ToastContainer position="top-center" autoClose={3000} />
       <h1 className="text-3xl font-bold mb-2 text-gray-800 ">Booked Room</h1>
       <div className="flex items-center justify-between mb-4">
-  <p className="text-gray-500 ">
-    Showing {reservations.length} Booked-Room(s)
-  </p>
-  <button
-    onClick={handleBookRoom} // Replace with your booking function
-    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
-  >
-    Book Room
-  </button>
-</div>
+        <p className="text-gray-500 ">
+          Showing {reservations.length} Booked-Room(s)
+        </p>
+        <button
+          onClick={handleBookRoom} // Replace with your booking function
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
+        >
+          Book Room
+        </button>
+      </div>
 
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto shadow rounded-lg border border-gray-200">
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
             <tr>
-              <th className="px-6 py-3">ID</th>
-              <th className="px-6 py-3">Client</th>
-              <th className="px-6 py-3">Room</th>
-              <th className="px-6 py-3">Check In</th>
-              <th className="px-6 py-3">Check Out</th>
-              <th className="px-6 py-3">Payment</th>
-              <th className="px-6 py-3">Total</th>
-              <th className="px-6 py-3">Paid</th>
-              <th className="px-6 py-3">Due</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              <th className="px-6 py-3 ">
+                <Hash size={16} className="mr-1" /> ID
+              </th>
+              <th className="px-6 py-3">
+                <User size={16} className="mr-1" /> Client
+              </th>
+              <th className="px-6 py-3">
+                <Bed size={16} className="mr-1" /> Room
+              </th>
+              <th className="px-6 py-3">
+                <CalendarCheck size={16} className="mr-1" /> Check In
+              </th>
+              <th className="px-6 py-3">
+                <CalendarX size={16} className="mr-1" /> Check Out
+              </th>
+              <th className="px-6 py-3">
+                <CreditCard size={16} className="mr-1" /> Payment
+              </th>
+              <th className="px-6 py-3">
+                <FileText size={16} className="mr-1" /> Total
+              </th>
+              <th className="px-6 py-3">
+                <Wallet size={16} className="mr-1" /> Paid
+              </th>
+              <th className="px-6 py-3">
+                <AlertCircle size={16} className="mr-1" /> Due
+              </th>
+              <th className="px-6 py-3">
+                <MoreVertical size={16} className="inline" /> Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -104,7 +137,22 @@ const ReservationsPage = () => {
                 <td className="px-6 py-4 font-medium text-gray-900">
                   #{index + 1 + (currentPage - 1) * limit}
                 </td>
-                <td className="px-6 py-4">{reservation.name}</td>
+                <td className="px-6 py-4">
+                  {reservation.guests[0].name}{" "}
+                  <button
+                    className="text-blue-600 hover:underline text-sm cursor-pointer"
+                    onClick={() =>
+                      navigate("/room/guest-details", {
+                        state: {
+                          guests: reservation.guests,
+                        },
+                      })
+                    }
+                  >
+                    View
+                  </button>
+                </td>
+
                 <td className="px-6 py-4">● {reservation.roomnumber}</td>
                 <td className="px-6 py-4">
                   {reservation.checkIn?.split("T")[0]}
@@ -129,18 +177,19 @@ const ReservationsPage = () => {
                   ₹{reservation.dueAmount || 0}
                 </td>
                 <td className="px-6 py-4 text-center flex justify-center items-center gap-2">
+                <button
+                    onClick={() => openCheckoutModal(reservation)}
+                    className="text-green-600 hover:text-green-800 transition text-sm border border-green-500 rounded px-2 py-1 cursor-pointer"
+                  >
+                    Checkout
+                  </button>
                   <button className="text-blue-600 hover:text-blue-800 transition">
                     ✏️
                   </button>
                   <button className="text-red-800 hover:text-red-800 transition text-sm border border-red-800 rounded px-2 py-1 cursor-pointer">
                     Cancel
                   </button>
-                  <button
-                    onClick={() => openCheckoutModal(reservation)}
-                    className="text-green-600 hover:text-green-800 transition text-sm border border-green-500 rounded px-2 py-1 cursor-pointer"
-                  >
-                    Checkout
-                  </button>
+                  
                 </td>
               </tr>
             ))}

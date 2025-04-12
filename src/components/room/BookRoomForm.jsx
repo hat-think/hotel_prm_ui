@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { getavailablehotelrooms,allocateroom } from "./api";
+import { getavailablehotelrooms, allocateroom } from "./api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 const BookingForm = () => {
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
   const [roomOptions, setRoomOptions] = useState([]);
   const [formData, setFormData] = useState({
-    name: "",
-    aadharNo: [""],
-    mobileNo: "",
-    emailId: "",
-    numberOfvisitors: 1,
     roomnumber: "",
     roomType: "",
+    numberOfvisitors: 1,
     checkIn: today,
     checkOut: tomorrow,
     totalAmount: "",
     paidAmount: "",
     address: "",
+    guests: [
+      {
+        name: "",
+        mobileNo: "",
+        emailId: "",
+        aadharNo: "",
+      },
+    ],
   });
 
   useEffect(() => {
@@ -55,6 +60,8 @@ const BookingForm = () => {
           roomnumber: value,
           totalAmount: selectedRoom.pricePerNight,
           paidAmount: selectedRoom.pricePerNight,
+          roomType: selectedRoom.roomType,
+
         }));
       } else {
         setFormData((prev) => ({
@@ -69,100 +76,65 @@ const BookingForm = () => {
     }
   };
 
-  const handleAadharChange = (index, value) => {
-    const updated = [...formData.aadharNo];
-    updated[index] = value;
-    setFormData((prev) => ({ ...prev, aadharNo: updated }));
+  const handleGuestChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedGuests = [...formData.guests];
+    updatedGuests[index][name] = value;
+
+    setFormData((prev) => ({
+      ...prev,
+      guests: updatedGuests,
+    }));
   };
 
-  const addAadharField = () => {
-    setFormData((prev) => ({ ...prev, aadharNo: [...prev.aadharNo, ""] }));
+  const addGuest = () => {
+    setFormData((prev) => ({
+      ...prev,
+      guests: [
+        ...prev.guests,
+        { name: "", mobileNo: "", emailId: "", aadharNo: "" },
+      ],
+    }));
   };
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-        const response = await allocateroom(formData);
-        if (response.status === 1) {
-            toast.success(response.msg);
-          } else {
-            toast.error(response.msg);
-          }
-      } catch (error) {
-        console.error("Error fetching room data:", error);
-
-      }
     if (!isRoomValid) {
       toast.error("Room number not available in hotel!");
+      return;
+    }
 
+    try {
+      const response = await allocateroom(formData);
+      if (response.status === 1) {
+        toast.success(response.msg);
+      } else {
+        toast.error(response.msg);
+      }
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      toast.error("Something went wrong!");
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md">
-              <ToastContainer position="top-center" autoClose={3000} />
-      <h2 className="text-2xl font-bold mb-4">Book Room</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="name">Name</label>
-          <input
-            id="name"
-            type="text"
-            name="name"
-            className="p-2 border rounded w-full"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Mobile Number */}
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="mobileNo">Mobile Number</label>
-          <input
-            id="mobileNo"
-            type="tel"
-            name="mobileNo"
-            className="p-2 border rounded w-full"
-            value={formData.mobileNo}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Email ID */}
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="emailId">Email ID</label>
-          <input
-            id="emailId"
-            type="email"
-            name="emailId"
-            className="p-2 border rounded w-full"
-            value={formData.emailId}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Visitors */}
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="numberOfvisitors">No. of Visitors</label>
-          <input
-            id="numberOfvisitors"
-            type="number"
-            name="numberOfvisitors"
-            className="p-2 border rounded w-full"
-            min={1}
-            value={formData.numberOfvisitors}
-            onChange={handleChange}
-          />
+      <ToastContainer position="top-center" autoClose={3000} />
+      <h2 className="text-2xl font-bold mb-4">Hotel Booking Form</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
+        {/* --- Hotel Info Section --- */}
+        <div className="md:col-span-2 mb-2">
+          <h3 className="text-xl font-semibold mb-2">Hotel Info</h3>
         </div>
 
         {/* Room Number */}
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="roomnumber">Room Number (Select or Enter)</label>
+          <label className="block text-sm font-medium mb-1">Room Number</label>
           <input
             list="roomnumbers"
-            id="roomnumber"
             name="roomnumber"
             className="p-2 border rounded w-full"
             value={formData.roomnumber}
@@ -174,72 +146,81 @@ const BookingForm = () => {
             ))}
           </datalist>
           {formData.roomnumber && !isRoomValid && (
-            <p className="text-red-500 text-sm mt-1">Room number not available in hotel.</p>
+            <p className="text-red-500 text-sm mt-1">Room not available.</p>
           )}
         </div>
 
         {/* Room Type */}
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="roomType">Room Type</label>
-          <select
-            id="roomType"
-            name="roomType"
-            className="p-2 border rounded w-full"
-            value={formData.roomType}
-            onChange={handleChange}
-          >
-            <option value="Standard">Standard</option>
-            <option value="Deluxe">Deluxe</option>
-            <option value="Suite">Suite</option>
-            <option value="Executive">Executive</option>
-          </select>
-        </div>
+        <div className="flex gap-4">
+  {/* Room Type */}
+  <div className="flex-1">
+    <label className="block text-sm font-medium mb-1">Room Type</label>
+    <input
+      name="roomType"
+      className="p-2 border rounded w-full"
+      value={formData.roomType}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Number of Visitors */}
+  <div className="flex-1">
+    <label className="block text-sm font-medium mb-1">Number of Visitors</label>
+    <input
+      id="numberOfvisitors"
+      type="number"
+      name="numberOfvisitors"
+      className="p-2 border rounded w-full"
+      min={1}
+      value={formData.numberOfvisitors}
+      onChange={handleChange}
+    />
+  </div>
+</div>
+
 
         {/* Check In */}
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="checkIn">Check In</label>
+          <label className="block text-sm font-medium mb-1">Check In</label>
           <input
-            id="checkIn"
             type="date"
             name="checkIn"
             className="p-2 border rounded w-full"
             value={formData.checkIn}
+            min={today}
             onChange={handleChange}
           />
         </div>
 
         {/* Check Out */}
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="checkOut">Check Out</label>
+          <label className="block text-sm font-medium mb-1">Check Out</label>
           <input
-            id="checkOut"
             type="date"
             name="checkOut"
             className="p-2 border rounded w-full"
             value={formData.checkOut}
+            min={formData.checkIn}
             onChange={handleChange}
           />
         </div>
 
         {/* Total Amount */}
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="totalAmount">Total Amount</label>
+          <label className="block text-sm font-medium mb-1">Total Amount</label>
           <input
-            id="totalAmount"
             type="number"
             name="totalAmount"
-            className="p-2 border rounded w-full bg-gray-100 text-gray-700"
+            className="p-2 border rounded w-full bg-gray-100"
             value={formData.totalAmount}
             onChange={handleChange}
-
           />
         </div>
 
         {/* Paid Amount */}
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="paidAmount">Paid Amount</label>
+          <label className="block text-sm font-medium mb-1">Paid Amount</label>
           <input
-            id="paidAmount"
             type="number"
             name="paidAmount"
             className="p-2 border rounded w-full"
@@ -249,10 +230,9 @@ const BookingForm = () => {
         </div>
 
         {/* Address */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-sm font-medium mb-1" htmlFor="address">Address</label>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium mb-1">Address</label>
           <textarea
-            id="address"
             name="address"
             className="p-2 border rounded w-full"
             rows={3}
@@ -261,34 +241,70 @@ const BookingForm = () => {
           />
         </div>
 
-        {/* Aadhar Numbers */}
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-sm font-medium mb-1">Aadhar Numbers</label>
-          {formData.aadharNo.map((num, index) => (
+        {/* --- Guest Info Section --- */}
+        <div className="md:col-span-2 mt-6">
+          <h3 className="text-xl font-semibold mb-2">Guest Info</h3>
+        </div>
+
+        {formData.guests.map((guest, index) => (
+          <div
+            key={index}
+            className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
+          >
             <input
-              key={index}
               type="text"
-              placeholder={`Aadhar No ${index + 1}`}
-              className="p-2 border rounded mb-2 w-full"
-              value={num}
-              onChange={(e) => handleAadharChange(index, e.target.value)}
+              placeholder="Guest Name"
+              name="name"
+              className="p-2 border rounded w-full"
+              value={guest.name}
+              onChange={(e) => handleGuestChange(index, e)}
             />
-          ))}
+            <input
+              type="tel"
+              placeholder="Mobile No"
+              name="mobileNo"
+              className="p-2 border rounded w-full"
+              value={guest.mobileNo}
+              onChange={(e) => handleGuestChange(index, e)}
+            />
+            <input
+              type="email"
+              placeholder="Email ID"
+              name="emailId"
+              className="p-2 border rounded w-full"
+              value={guest.emailId}
+              onChange={(e) => handleGuestChange(index, e)}
+            />
+            <input
+              type="text"
+              placeholder="Aadhar Number"
+              name="aadharNo"
+              className="p-2 border rounded w-full"
+              value={guest.aadharNo}
+              onChange={(e) => handleGuestChange(index, e)}
+            />
+          </div>
+        ))}
+
+        <div className="md:col-span-2">
           <button
             type="button"
-            onClick={addAadharField}
-            className="text-blue-600 text-sm mt-1"
+            onClick={addGuest}
+            className="text-blue-600 text-sm"
           >
-            + Add Aadhar
+            + Add Another Guest
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded col-span-1 md:col-span-2 hover:bg-blue-700"
-        >
-          Submit Booking
-        </button>
+        {/* Submit */}
+        <div className="md:col-span-2 mt-4">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Submit Booking
+          </button>
+        </div>
       </form>
     </div>
   );

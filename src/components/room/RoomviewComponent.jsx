@@ -103,7 +103,7 @@ const RoomList = () => {
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <ToastContainer position="top-center" autoClose={3000} />
-      <h1 className="text-3xl font-bold mb-4 text-gray-800">Booked Rooms</h1>
+      <h1 className="text-3xl font-bold mb-4 text-gray-800">View Rooms</h1>
 
       <div className="flex items-center justify-between mb-4">
         <p className="text-gray-500">Total: {rooms.length} room(s)</p>
@@ -119,29 +119,16 @@ const RoomList = () => {
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200 hidden md:block">
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-            <tr>
-              <th className="px-4 py-3 text-center">
-                <Hash size={16} />#
-              </th>
-              <th className="px-4 py-3 text-center">
-                <BedDouble size={16} /> Room No.
-              </th>
-              <th className="px-4 py-3 text-center">
-                <Building2 size={16} /> Type
-              </th>
-              <th className="px-4 py-3 text-center">
-                <IndianRupee size={16} /> Price
-              </th>
-              <th className="px-4 py-3 text-center">
-                <Users size={16} /> Occupancy
-              </th>
-              <th className="px-4 py-3 text-center">
-                <CheckCircle size={16} /> Available
-              </th>
-              <th className="px-4 py-3 text-center">
-                <PencilLine size={16} /> Action
-              </th>
-            </tr>
+            
+      
+
+            <th className="px-6 py-3"><Hash size={16} className="inline mr-1" /></th>
+              <th className="px-6 py-3 "><BedDouble size={16} className="inline mr-1" />Room No.</th>
+              <th className="px-6 py-3 "><Building2 size={16} className="inline mr-1" />Type</th>
+              <th className="px-6 py-3 "><IndianRupee size={16} className="inline mr-1" />Price</th>
+              <th className="px-6 py-3 "><Users size={16} className="inline mr-1" />Occupancy</th>
+              <th className="px-6 py-3 "><CheckCircle size={16} className="inline mr-1" />Available</th>
+              <th className="px-6 py-3 "><PencilLine size={16} className="inline mr-1" />Action</th>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedRooms.map((room, index) => (
