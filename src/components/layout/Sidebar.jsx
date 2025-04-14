@@ -15,6 +15,7 @@ import {
   Contact,
   LogOut,
   HelpCircle,
+  UserCog 
 } from "lucide-react";
 
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -33,6 +34,7 @@ const iconMap = {
   Customers: Users,
   Leads: Contact,
   Logout: LogOut,
+  "All Employee": UserCog ,
 };
 
 // Menu config without icon fields
@@ -57,7 +59,7 @@ const menuItems = [
   {
     label: "CRM",
     children: [
-      { label: "Customers", route: "/crm/customers" },
+      { label: "All Employee", route: "/hrms/allemployee" },
       { label: "Leads", route: "/crm/leads" },
     ],
   },

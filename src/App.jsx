@@ -10,6 +10,9 @@ import ProfilePage from "./pages/ProfilePage";
 import BookRoom from "./pages/Room/BookRoom";
 import GuestDetails from "./pages/Room/GuestDetails";
 import PrivateRoute from "./utilities/PrivateRoute"; // Import it
+import AllEmployee from "./pages/Hrms/AllEmployee";
+import AttendanceTable from "./pages/Hrms/AttendanceTable";
+
 
 const App = () => {
   return (
@@ -81,6 +84,22 @@ const App = () => {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path="/hrms/allemployee"
+          element={
+            <PrivateRoute>
+              <AllEmployee />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/hrms/Attendance"
+          element={
+            <PrivateRoute>
+              <AttendanceTable />
             </PrivateRoute>
           }
         />
