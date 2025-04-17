@@ -12,6 +12,7 @@ import GuestDetails from "./pages/Room/GuestDetails";
 import PrivateRoute from "./utilities/PrivateRoute"; // Import it
 import AllEmployee from "./pages/Hrms/AllEmployee";
 import AttendanceTable from "./pages/Hrms/AttendanceTable";
+import Calendar from "./pages/Room/Calendar";
 
 
 const App = () => {
@@ -100,6 +101,14 @@ const App = () => {
           element={
             <PrivateRoute>
               <AttendanceTable />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/room/Calendar"
+          element={
+            <PrivateRoute>
+              <Calendar />
             </PrivateRoute>
           }
         />

@@ -15,7 +15,8 @@ import {
   Contact,
   LogOut,
   HelpCircle,
-  UserCog 
+  UserCog ,
+  Calendar 
 } from "lucide-react";
 
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -23,6 +24,7 @@ import clsx from "clsx";
 
 // Icon mapping based on label names
 const iconMap = {
+  Calendar:CalendarCheck,
   Dashboard: BarChart,
   Room: ShoppingCart,
   "Add Room": Package,
@@ -46,6 +48,7 @@ const menuItems = [
   {
     label: "Room",
     children: [
+      { label: "Calendar", route: "/room/Calendar" },
       { label: "Add Room", route: "/room/add-room" },
       { label: "Book Room", route: "/room/book-room" },
       { label: "View Room", route: "/room/room-view" },
@@ -60,7 +63,7 @@ const menuItems = [
     label: "CRM",
     children: [
       { label: "All Employee", route: "/hrms/allemployee" },
-      { label: "Leads", route: "/crm/leads" },
+      { label: "Attendance", route: "/hrms/Attendance" },
     ],
   },
 ];
