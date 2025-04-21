@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getactivevisitor, checkoutvisitor } from "./api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import {
   Hash,
   User,

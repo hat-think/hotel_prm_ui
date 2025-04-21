@@ -1,6 +1,6 @@
 // src/components/ReservationCalendar.jsx
 import { useState, useEffect, useRef } from 'react';
-import { gethotelrooms } from "./api";
+import { gethotelrooms } from "../room/api";
 
 const ReservationCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
