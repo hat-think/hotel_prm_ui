@@ -1,42 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, Clock, XCircle } from 'lucide-react';
-
-const attendanceData = [
-  {
-    name: 'Joan Dyer',
-    records: Array(31).fill('present').map((val, idx) =>
-      [3, 10, 16].includes(idx + 1) ? 'half' : val
-    ),
-  },
-  {
-    name: 'Ryan Randall',
-    records: Array(31).fill('present').map((val, idx) =>
-      [1, 8, 17].includes(idx + 1) ? 'absent' : [13, 14].includes(idx + 1) ? 'half' : val
-    ),
-  },
-  {
-    name: 'Phil Glover',
-    records: Array(31).fill('present').map((val, idx) =>
-      [16, 22].includes(idx + 1) ? 'half' : val
-    ),
-  },
-];
+import { getAttendance } from "./api";
 
 const AttendanceIcon = ({ status }) => {
-  if (status === 'present') return <CheckCircle className="text-green-500 w-4 h-4 mx-auto" />;
-  if (status === 'half') return <Clock className="text-yellow-500 w-4 h-4 mx-auto" />;
-  if (status === 'absent') return <XCircle className="text-red-500 w-4 h-4 mx-auto" />;
-  return null;
+  if (status === 1) return <CheckCircle className="text-green-500 w-4 h-4 mx-auto" />;
+  if (status === 2) return <Clock className="text-yellow-500 w-4 h-4 mx-auto" />;
+  if (status === 0) return <XCircle className="text-red-500 w-4 h-4 mx-auto" />;
+  return <span className="text-gray-400 w-4 h-4 mx-auto">-</span>;
 };
 
 const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
+
+const transformAttendanceData = (apiData, month, year) => {
+  const daysInMonth = getDaysInMonth(month, year);
+  
+  // Group records by employeeId
+  const employeesMap = new Map();
+  
+  apiData.forEach(record => {
+    if (record.month === month && record.year === year) {
+      if (!employeesMap.has(record.employeeId)) {
+        employeesMap.set(record.employeeId, {
+          employeeId: record.employeeId,
+          name: record.employeeId, // Replace with actual name if available
+          records: Array(daysInMonth).fill(null) // Initialize with null for unmarked days
+        });
+      }
+      
+      // Update the records for each day
+      record.days.forEach(dayRecord => {
+        const employee = employeesMap.get(record.employeeId);
+        employee.records[dayRecord.day - 1] = dayRecord.status;
+      });
+    }
+  });
+  
+  return Array.from(employeesMap.values());
+};
 
 const AttendanceTable = () => {
   const today = new Date();
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const totalDays = getDaysInMonth(selectedMonth, selectedYear);
+
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      try {
+        setLoading(true);
+        const response = await getAttendance(selectedMonth, selectedYear);
+        if (response.status === 1) {
+          const transformedData = transformAttendanceData(response.result, selectedMonth, selectedYear);
+          setAttendanceData(transformedData);
+          setError(null);
+        } else {
+          throw new Error(response.message || "No attendance data found");
+        }
+      } catch (err) {
+        setError(err.message);
+        setAttendanceData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendanceData();
+  }, [selectedMonth, selectedYear]);
+
+  // ... [rest of the component remains the same until the return statement]
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -81,25 +116,34 @@ const AttendanceTable = () => {
             </tr>
           </thead>
           <tbody>
-            {attendanceData.map((emp, idx) => (
-              <tr key={idx} className="border-t hover:bg-gray-50">
-                <td className="px-4 py-2 font-medium whitespace-nowrap">{emp.name}</td>
-                {Array.from({ length: totalDays }, (_, index) => (
-                  <td key={index} className="text-center py-2 px-1">
-                    <AttendanceIcon status={emp.records[index]} />
-                  </td>
-                ))}
+            {attendanceData.length > 0 ? (
+              attendanceData.map((emp, idx) => (
+                <tr key={idx} className="border-t hover:bg-gray-50">
+                  <td className="px-4 py-2 font-medium whitespace-nowrap">{emp.name}</td>
+                  {Array.from({ length: totalDays }, (_, index) => (
+                    <td key={index} className="text-center py-2 px-1">
+                      <AttendanceIcon status={emp.records[index]} />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={totalDays + 1} className="text-center py-4 text-gray-500">
+                  {error || "No attendance data available"}
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Legend */}
       <div className="flex flex-col sm:flex-row gap-3 mt-4 text-sm text-gray-600">
-        <div className="flex items-center gap-1"><CheckCircle className="text-green-500 w-4 h-4" /> Full Day Present</div>
-        <div className="flex items-center gap-1"><Clock className="text-yellow-500 w-4 h-4" /> Half Day Present</div>
-        <div className="flex items-center gap-1"><XCircle className="text-red-500 w-4 h-4" /> Full Day Absence</div>
+        <div className="flex items-center gap-1"><CheckCircle className="text-green-500 w-4 h-4" /> Present (1)</div>
+        <div className="flex items-center gap-1"><Clock className="text-yellow-500 w-4 h-4" /> Half Day (2)</div>
+        <div className="flex items-center gap-1"><XCircle className="text-red-500 w-4 h-4" /> Absent (0)</div>
+        <div className="flex items-center gap-1"><span className="text-gray-400">-</span> Not Marked</div>
       </div>
     </div>
   );

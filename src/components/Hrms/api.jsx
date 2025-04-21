@@ -60,3 +60,22 @@ export const updateEmployee = async (data) => {
     };
   }
 };
+
+export const getAttendance = async (month, year) => {
+  const token = await getFromStorage("token");
+
+  try {
+    const response = await ApiCaller.get(`${API_BASE_URL}/get-attendance`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        month,
+        year
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Fetching attendance data failed");
+  }
+};

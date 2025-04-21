@@ -9,12 +9,16 @@ import {
   Hash,
   PencilLine,
   QrCode,
+  ImageIcon,
 } from "lucide-react";
 import QrModal from "./QrModal";
+import ImageModal from "./ImageModal";
 
 const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
 
   const handleQrClick = (employee) => {
     setSelectedEmployee(employee);
@@ -24,6 +28,16 @@ const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
   const closeQrModal = () => {
     setQrModalOpen(false);
     setSelectedEmployee(null);
+  };
+
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setImageModalOpen(false);
+    setSelectedImage("");
   };
 
   return (
@@ -54,6 +68,9 @@ const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
                 <CheckCircle size={16} className="inline mr-1" /> Active
               </th>
               <th className="px-6 py-3">
+                <ImageIcon size={16} className="inline mr-1" /> Documents
+              </th>
+              <th className="px-6 py-3">
                 <PencilLine size={16} className="inline mr-1" /> Edit
               </th>
               <th className="px-6 py-3">
@@ -82,6 +99,34 @@ const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
                       <XCircle size={14} /> No
                     </span>
                   )}
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex flex-wrap gap-2">
+                    {employee.AadharCardFront && (
+                      <button
+                        onClick={() => handleImageClick(employee.AadharCardFront)}
+                        className="text-blue-600 hover:underline cursor-pointer text-xs flex items-center gap-1"
+                      >
+                        <ImageIcon size={12} /> Aadhar Front
+                      </button>
+                    )}
+                    {employee.AadharCardBack && (
+                      <button
+                        onClick={() => handleImageClick(employee.AadharCardBack)}
+                        className="text-blue-600 hover:underline cursor-pointer text-xs flex items-center gap-1"
+                      >
+                        <ImageIcon size={12} /> Aadhar Back
+                      </button>
+                    )}
+                    {employee.Marksheet && (
+                      <button
+                        onClick={() => handleImageClick(employee.Marksheet)}
+                        className="text-blue-600 hover:underline cursor-pointer text-xs flex items-center gap-1"
+                      >
+                        <ImageIcon size={12} /> Marksheet
+                      </button>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-2 text-center">
                   {employee.isActive ? (
@@ -116,6 +161,13 @@ const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
         isOpen={qrModalOpen}
         onClose={closeQrModal}
         employee={selectedEmployee}
+      />
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={imageModalOpen}
+        onClose={closeImageModal}
+        imageUrl={selectedImage}
       />
     </>
   );
