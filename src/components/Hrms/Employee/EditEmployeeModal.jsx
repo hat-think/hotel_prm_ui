@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { updateEmployee } from "./api";
+import { updateEmployee } from "../api";
 import { toast } from "react-toastify";
 import { UserRoundCog } from "lucide-react";
 

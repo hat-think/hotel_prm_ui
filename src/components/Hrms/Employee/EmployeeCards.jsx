@@ -92,6 +92,14 @@ const EmployeeCards = ({ employees, currentPage, limit, onEditClick }) => {
                       <ImageIcon size={12} /> Marksheet
                     </button>
                   )}
+                   {employee.Employeephoto && (
+                    <button
+                      onClick={() => handleImageClick(employee.Employeephoto)}
+                      className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded flex items-center gap-1"
+                    >
+                      <ImageIcon size={12} /> Emp photo
+                    </button>
+                  )}
                 </div>
               </div>
 

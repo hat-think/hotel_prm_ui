@@ -125,6 +125,13 @@ const EmployeeTable = ({ employees, currentPage, limit, onEditClick }) => {
                       >
                         <ImageIcon size={12} /> Marksheet
                       </button>
+                    )}{employee.Employeephoto && (
+                      <button
+                        onClick={() => handleImageClick(employee.Employeephoto)}
+                        className="text-blue-600 hover:underline cursor-pointer text-xs flex items-center gap-1"
+                      >
+                        <ImageIcon size={12} /> Emp photo
+                      </button>
                     )}
                   </div>
                 </td>

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { getEmployeeList, getAttendance, addattendance } from "./api";
-import AttendanceControls from './AttendanceControls';
-import AttendanceTable from './AttendanceTable';
-import { CheckCircle2, Clock, XCircle } from 'lucide-react';
-import SalarySlipGenerator from './SalarySlipGenerator';
+import React, { useState, useEffect } from "react";
+import { getEmployeeList, getAttendance, addattendance } from "../api";
+import AttendanceControls from "./AttendanceControls";
+import AttendanceTable from "./AttendanceTable";
+import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import SalarySlipGenerator from "./SalarySlipDashboard";
 
 const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -23,20 +23,24 @@ const AttendancePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         const empResponse = await getEmployeeList();
-        if (empResponse.status !== 1) throw new Error("Failed to fetch employees");
-        
+        if (empResponse.status !== 1)
+          throw new Error("Failed to fetch employees");
+
         const attResponse = await getAttendance(selectedMonth, selectedYear);
-        if (attResponse.status !== 1) throw new Error(attResponse.message || "No attendance data found");
+        if (attResponse.status !== 1)
+          throw new Error(attResponse.message || "No attendance data found");
 
         setEmployees(empResponse.result);
-        setAttendanceData(transformAttendanceData(
-          empResponse.result,
-          attResponse.result, 
-          selectedMonth, 
-          selectedYear
-        ));
+        setAttendanceData(
+          transformAttendanceData(
+            empResponse.result,
+            attResponse.result,
+            selectedMonth,
+            selectedYear
+          )
+        );
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -51,12 +55,16 @@ const AttendancePage = () => {
 
   const transformAttendanceData = (employees, apiData, month, year) => {
     const daysInMonth = getDaysInMonth(month, year);
-    const attendanceMap = new Map(apiData.map(record => [record.employeeId, record]));
+    const attendanceMap = new Map(
+      apiData.map((record) => [record.employeeId, record])
+    );
 
-    return employees.map(employee => {
-      const empAttendance = attendanceMap.get(employee.employeeId) || { days: [] };
+    return employees.map((employee) => {
+      const empAttendance = attendanceMap.get(employee.employeeId) || {
+        days: [],
+      };
       const records = Array.from({ length: daysInMonth }, (_, i) => {
-        const dayRecord = empAttendance.days.find(d => d.day === i + 1);
+        const dayRecord = empAttendance.days.find((d) => d.day === i + 1);
         return dayRecord ? dayRecord.status : null;
       });
 
@@ -65,7 +73,7 @@ const AttendancePage = () => {
   };
 
   const handleStatusChange = (empIndex, dayIndex, newStatus) => {
-    setAttendanceData(prev => {
+    setAttendanceData((prev) => {
       const updated = [...prev];
       updated[empIndex].records[dayIndex] = newStatus;
       return updated;
@@ -75,33 +83,40 @@ const AttendancePage = () => {
   const handleSaveAttendance = async () => {
     try {
       setLoading(true);
-      
-      const dataToSave = attendanceData.flatMap(employee => 
+
+      const dataToSave = attendanceData.flatMap((employee) =>
         employee.records
-          .map((status, index) => status !== null ? {
-            employeeId: employee.employeeId,
-            status,
-            day: index + 1
-          } : null)
+          .map((status, index) =>
+            status !== null
+              ? {
+                  employeeId: employee.employeeId,
+                  status,
+                  day: index + 1,
+                }
+              : null
+          )
           .filter(Boolean)
       );
 
       const response = await addattendance(dataToSave);
-      if (response.status !== 1) throw new Error(response.message || "Failed to save attendance");
+      if (response.status !== 1)
+        throw new Error(response.message || "Failed to save attendance");
 
       setIsEditing(false);
       const [empResponse, attResponse] = await Promise.all([
         getEmployeeList(),
-        getAttendance(selectedMonth, selectedYear)
+        getAttendance(selectedMonth, selectedYear),
       ]);
-      
+
       setEmployees(empResponse.result);
-      setAttendanceData(transformAttendanceData(
-        empResponse.result,
-        attResponse.result,
-        selectedMonth,
-        selectedYear
-      ));
+      setAttendanceData(
+        transformAttendanceData(
+          empResponse.result,
+          attResponse.result,
+          selectedMonth,
+          selectedYear
+        )
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -116,7 +131,7 @@ const AttendancePage = () => {
         <div className="flex items-center gap-4">
           <button
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
-            onClick={() => setShowSalarySlip(prev => !prev)}
+            onClick={() => setShowSalarySlip((prev) => !prev)}
           >
             {showSalarySlip ? "Hide" : "Show"} Salary Slips
           </button>
@@ -134,8 +149,9 @@ const AttendancePage = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-4">Loading...</div>
-      ) : error ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>      ) : error ? (
         <div className="text-center py-4 text-red-500">{error}</div>
       ) : attendanceData.length > 0 ? (
         <>
@@ -147,10 +163,18 @@ const AttendancePage = () => {
             employees={employees}
           />
           <div className="flex flex-col sm:flex-row gap-3 mt-4 text-sm text-gray-600">
-            <div className="flex items-center gap-1"><CheckCircle2 className="text-green-500 w-4 h-4" /> Present (P)</div>
-            <div className="flex items-center gap-1"><Clock className="text-yellow-500 w-4 h-4" /> Half Day (H)</div>
-            <div className="flex items-center gap-1"><XCircle className="text-red-500 w-4 h-4" /> Absent (A)</div>
-            <div className="flex items-center gap-1"><span className="text-gray-400">-</span> Not Marked</div>
+            <div className="flex items-center gap-1">
+              <CheckCircle2 className="text-green-500 w-4 h-4" /> Present (P)
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="text-yellow-500 w-4 h-4" /> Half Day (H)
+            </div>
+            <div className="flex items-center gap-1">
+              <XCircle className="text-red-500 w-4 h-4" /> Absent (A)
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-gray-400">-</span> Not Marked
+            </div>
           </div>
         </>
       ) : (
@@ -158,10 +182,7 @@ const AttendancePage = () => {
       )}
 
       {showSalarySlip && (
-        <SalarySlipGenerator 
-          month={selectedMonth} 
-          year={selectedYear} 
-        />
+        <SalarySlipGenerator month={selectedMonth} year={selectedYear} />
       )}
     </div>
   );

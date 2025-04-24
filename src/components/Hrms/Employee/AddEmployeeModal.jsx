@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { addEmployee } from "./api";
+import { addEmployee } from "../api";
 import { toast } from "react-toastify";
 import { PlusCircle } from "lucide-react";
 
@@ -39,29 +39,68 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
     }));
   };
 
+  const validateForm = () => {
+    // Basic required field validation
+    const requiredFields = [
+      'name', 'email', 'phone', 'department', 
+      'designation', 'dateOfJoining', 'salary', 'dob', 'address'
+    ];
+    
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        toast.error(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        return false;
+      }
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    // Phone validation (basic 10-digit check)
+    if (!/^\d{10,15}$/.test(formData.phone)) {
+      toast.error("Please enter a valid phone number (10-15 digits)");
+      return false;
+    }
+
+    // Salary validation
+    if (parseFloat(formData.salary) <= 0) {
+      toast.error("Salary must be greater than 0");
+      return false;
+    }
+
+    // File validation (example: make Aadhar front required)
+    if (!files.aadharFront) {
+      toast.error("Aadhar Card (Front) is required");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const data = new FormData();
-
-      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
 
-      // Append files if they exist
       Object.entries(files).forEach(([key, file]) => {
         if (file) {
           data.append(key, file);
         }
       });
-
-      // Debug: Log form data before sending
-      for (let [key, value] of data.entries()) {
-        console.log(key, value);
-      }
 
       const response = await addEmployee(data);
       
@@ -69,7 +108,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
         toast.success(response.msg || "Employee added successfully!");
         onClose();
         onEmployeeAdded();
-        // Reset form after successful submission
+        // Reset form
         setFormData({
           name: "",
           email: "",
@@ -86,6 +125,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
           aadharFront: null,
           aadharBack: null,
           marksheet: null,
+          employeephoto: null,
+
         });
       } else {
         toast.error(response.msg || "Failed to add employee.");
@@ -101,7 +142,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-md w-full max-w-md max-h-[90vh] flex flex-col">
         {/* Modal Header */}
         <div className="p-6 border-b">
@@ -117,17 +158,17 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
             {[
               { label: "Full Name", name: "name", type: "text" },
               { label: "Email", name: "email", type: "email" },
-              { label: "Phone", name: "phone", type: "tel" },
+              { label: "Phone", name: "phone", type: "tel", pattern: "[0-9]{10,15}" },
               { label: "Department", name: "department", type: "text" },
               { label: "Designation", name: "designation", type: "text" },
               { label: "Date of Birth", name: "dob", type: "date" },
               { label: "Address", name: "address", type: "text" },
               { label: "Date of Joining", name: "dateOfJoining", type: "date" },
-              { label: "Salary", name: "salary", type: "number" },
+              { label: "Salary", name: "salary", type: "number", min: "1" },
             ].map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-medium mb-1">
-                  {field.label}
+                  {field.label} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type={field.type}
@@ -136,19 +177,24 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
                   onChange={handleInputChange}
                   className="w-full border rounded p-2"
                   required
+                  {...(field.pattern && { pattern: field.pattern })}
+                  {...(field.min && { min: field.min })}
                 />
               </div>
             ))}
 
             {/* File Upload Fields */}
             {[
-              { label: "Aadhar Card (Front)", name: "aadharFront" },
-              { label: "Aadhar Card (Back)", name: "aadharBack" },
-              { label: "Marksheet/Qualification Proof", name: "marksheet" },
+              { label: "Aadhar Card (Front)", name: "aadharFront", required: true },
+              { label: "Aadhar Card (Back)", name: "aadharBack", required: false },
+              { label: "Marksheet/Qualification Proof", name: "marksheet", required: false },
+              { label: "Employee photo", name: "employeephoto", required: false },
+
             ].map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-medium mb-1">
-                  {field.label}
+                  {field.label} 
+                  {field.required && <span className="text-red-500"> *</span>}
                 </label>
                 <input
                   type="file"
@@ -156,6 +202,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
                   onChange={handleFileChange}
                   className="w-full border rounded p-2"
                   accept="image/*,.pdf"
+                  required={field.required}
                 />
                 {files[field.name] && (
                   <p className="text-xs text-gray-500 mt-1">
@@ -165,29 +212,28 @@ const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
                 )}
               </div>
             ))}
-          </form>
-        </div>
 
-        {/* Fixed Footer with Buttons */}
-        <div className="p-4 border-t bg-gray-50">
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Add Employee"}
-            </button>
-          </div>
+            {/* Form Buttons */}
+            <div className="p-4 border-t bg-gray-50 mt-4 -mx-6 -mb-6">
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-400"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Add Employee"}
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>

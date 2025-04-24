@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getEmployeeList } from "./api";
+import { getEmployeeList } from "../api";
 import { ToastContainer } from "react-toastify";
 import { PlusCircle } from "lucide-react";
 import EmployeeTable from "./EmployeeTable";
